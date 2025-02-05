@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@carny/core": "workspace:*",
+    "@carny/config": "workspace:*",
     "@grammyjs/emoji": "^1.2.0",
     "@grammyjs/parse-mode": "^1.11.1",
     "grammy": "^1.34.1"

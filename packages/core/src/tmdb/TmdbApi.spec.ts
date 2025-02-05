@@ -18,4 +18,10 @@ describe(TmdbApi.name, () => {
       console.log(hits)
     });
   });
+
+  describe('getTvShow', () => {
+    it('should ', async () => {
+    })
+
+  })
 })
