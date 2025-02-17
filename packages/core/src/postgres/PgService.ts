@@ -1,13 +1,28 @@
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+import { AsyncLocalStorage } from 'node:async_hooks'
+import * as schema from './schema.js'
 
 export class PgService {
-  private readonly db: PostgresJsDatabase
+  private readonly db: PostgresJsDatabase<typeof schema>
   private readonly connection
+  private readonly txStorage = new AsyncLocalStorage<
+    PostgresJsDatabase<typeof schema>
+  >()
 
   constructor(connectionUrl: string) {
     this.connection = postgres(connectionUrl)
-    this.db = drizzle(this.connection)
+    this.db = drizzle(this.connection, {
+      schema,
+    })
+  }
+
+  getClient(): PostgresJsDatabase<typeof schema> {
+    return this.db
+  }
+
+  getTransaction(): PostgresJsDatabase<typeof schema> | null {
+    return this.txStorage.getStore() || null
   }
 
   /**

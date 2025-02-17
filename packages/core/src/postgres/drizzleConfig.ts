@@ -4,8 +4,11 @@ import path from 'node:path'
 
 const config = loadConfig()
 
-const schemaPath = path.resolve(__dirname, 'schema.ts')
-const migrationsPath = path.resolve(__dirname, 'migrations')
+// https://github.com/drizzle-team/drizzle-orm/issues/3807
+// Remove first slash to fix the issue above.
+const migrationsPath = path.join(__dirname, 'migrations').replace('/', '')
+
+const schemaPath = path.join(__dirname, 'schema.ts')
 
 export default defineConfig({
   dialect: 'postgresql',

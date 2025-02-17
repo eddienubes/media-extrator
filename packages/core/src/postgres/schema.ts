@@ -15,8 +15,11 @@ export const tvShowsTable = pgTable('tv_shows', {
   overview: varchar().notNull(),
   releaseDate: timestamp().notNull(),
   posterUrl: varchar().notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .$onUpdate(() => new Date())
+    .defaultNow(),
 })
 
 export const tvShowEpisodesTable = pgTable('tv_show_episodes', {
@@ -25,8 +28,11 @@ export const tvShowEpisodesTable = pgTable('tv_show_episodes', {
   season: integer().notNull(),
   episode: integer().notNull(),
   subtitles: jsonb().notNull().$type<any>(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .$onUpdate(() => new Date())
+    .defaultNow(),
 })
 
 export const tvShowsRelations = relations(tvShowsTable, ({ many }) => ({
@@ -41,6 +47,9 @@ export const moviesTable = pgTable('movies', {
   releaseDate: timestamp().notNull(),
   subtitles: jsonb().notNull().$type<any>(),
   posterUrl: varchar().notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .$onUpdate(() => new Date())
+    .defaultNow(),
 })
