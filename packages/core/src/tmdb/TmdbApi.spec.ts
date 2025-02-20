@@ -3,7 +3,7 @@ import {
   makeStandardFetcher,
   targets,
   makeProviders,
-  ScrapeMedia,
+  ScrapeMedia, ShowMedia,
 } from '@movie-web/providers'
 import util from 'node:util'
 
@@ -65,5 +65,20 @@ describe(TmdbApi.name, () => {
 
       console.log(res)
     })
+  })
+
+  it('should another test', async () => {
+    const media: ShowMedia = {
+      type: 'show',
+      season: { number: 1, tmdbId: '79823' },
+      episode: { number: 2, tmdbId: '1230809' },
+      releaseYear: 2016,
+      title: 'Travelers',
+      tmdbId: '67683',
+      imdbId: 'tt5651844',
+    };
+
+
+
   })
 })
