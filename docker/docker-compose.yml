@@ -6,7 +6,7 @@ services:
     container_name: me-pg
     restart: no
     healthcheck:
-      test: "psql -U root me-database -c ''"
+      test: "psql -U root me_database -c ''"
       interval: 5s
       timeout: 5s
       retries: 3
@@ -20,8 +20,24 @@ services:
     volumes:
       - me-pg-data:/var/lib/postgresql
       - ./postgres:/docker-entrypoint-initdb.d
+  me-jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: me-jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS= #optional
+    volumes:
+      #      - /path/to/jackett/data:/config
+      - me-jackett-data:/downloads
+    ports:
+      - "9117:9117"
 
 
 volumes:
   me-pg-data:
     name: me-pg-data
+  me-jackett-data:
+    name: me-jackett-data

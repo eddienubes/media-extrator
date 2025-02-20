@@ -1,9 +1,9 @@
 import { TmdbApi } from './TmdbApi.js'
 import {
-  buildProviders,
   makeStandardFetcher,
   targets,
   makeProviders,
+  ScrapeMedia,
 } from '@movie-web/providers'
 import util from 'node:util'
 
@@ -39,24 +39,28 @@ describe(TmdbApi.name, () => {
       const showId = 67683
       const show = await api.getTvShow(showId)
       const hit = await api.getTvShowSeason(showId, 1)
-      const firstEpisode = hit.episodes?.[0].id
+      const episode = hit.episodes?.[1]
       // console.log(util.inspect(hit, { depth: null }))
 
-      const res = await providers.runAll({
-        media: {
-          type: 'show',
-          season: {
-            number: 1,
-            tmdbId: hit.id.toString(),
-          },
-          episode: {
-            number: 11,
-            tmdbId: firstEpisode?.toString() as string,
-          },
-          releaseYear: new Date(show.first_air_date as string).getFullYear(),
-          title: 'Travelers',
-          tmdbId: showId.toString(),
+      const media: ScrapeMedia = {
+        type: 'show',
+        season: {
+          number: 1,
+          tmdbId: hit.id.toString(),
         },
+        episode: {
+          number: episode?.episode_number as number,
+          tmdbId: episode?.id?.toString() as string,
+        },
+        releaseYear: new Date(show.first_air_date as string).getFullYear(),
+        title: 'Travelers',
+        tmdbId: showId.toString(),
+      }
+
+      console.log(media)
+
+      const res = await providers.runAll({
+        media,
       })
 
       console.log(res)
