@@ -7,6 +7,7 @@ import path from 'node:path'
 const main = async () => {
   // GoT https://vidsrc.xyz/embed/tv?imdb=tt0944947&season=1&episode=1
   // Fringe https://vidsrc.xyz/embed/tv?imdb=tt1119644&season=1&episode=1
+  // Severance https://vidsrc.xyz/embed/tv?imdb=tt11280740&season=2&episode=6
 
   const blocker = await PlaywrightBlocker.fromPrebuiltAdsAndTracking(fetch)
 
@@ -39,7 +40,7 @@ const main = async () => {
   })
 
   await page.goto(
-    'https://vidsrc.xyz/embed/tv?imdb=tt1119644&season=1&episode=1',
+    'https://vidsrc.xyz/embed/tv?imdb=tt11280740&season=2&episode=6',
   )
 
   const serverLocators = await page.locator('.server').all()
@@ -69,6 +70,7 @@ const main = async () => {
     await body.click()
     await body.click()
     await page.waitForTimeout(5000)
+    await body.click()
     console.log('Clicked body')
   }
 

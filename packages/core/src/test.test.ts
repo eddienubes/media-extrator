@@ -8,6 +8,7 @@ import ffmprobeBinary from '@ffprobe-installer/ffprobe'
 import { Readable } from 'node:stream'
 import { ReadableStream } from 'node:stream/web'
 import path from 'node:path'
+import subtitle from 'subtitle'
 
 const getFfmpeg = () => {
   const ffmpeg = ffmpegFactory()
@@ -237,8 +238,6 @@ describe('something', () => {
   })
 
   it('should convert hls to mp4', async () => {
-    const subtitlesPath = path.join(__dirname, 'subtitles.srt')
-
     const cutSomething = async (
       inputs: string[],
       output: string,
@@ -248,7 +247,9 @@ describe('something', () => {
       const ffmpeg = getFfmpeg()
 
       for (const input of inputs) {
-        ffmpeg.input(input)
+        ffmpeg
+          .input(input)
+          .inputOptions(['-protocol_whitelist file,http,https,tcp,tls'])
       }
 
       ffmpeg
@@ -269,19 +270,64 @@ describe('something', () => {
         .run()
     }
 
-    await cutSomething(
-      [
-        'https://tmstr3.luminousstreamhaven.com/stream_new/H4sIAAAAAAAAAw3KXXNDQBQA0L_Ebgh9bFiGWkO4Pt6uvSbKEmYkVb..Pc_ngsgdZqNFvc0s5Vgm75VDeLU7oqvBPjIWXfJgj7rA5TCRndz3rR31C4Lj1cHA0hI.5TwABe2mOBSZcTlh2kuohgO5Ft0yhA0T_l3LWZ4Poy3XLQnztClXnrBj.mLDTOHwLKcf3owgcHyY0pNLwUSRA0R4c9_I5akmPQOssaoOP_GoymqYs8rdKMy_70WE0oPfftG33jfe6AH0NVhptUYxa19pKA7F3LhfhjNm2sw4NAkn7KvkKBey29nC1N_tfAFf1f_HAEY8e3c8f6JYseCkU98s6YyM7mxvySgnrEVBp.H.AfNjdHJBAQAA/master.m3u8',
-      ],
-      'output.mp4',
-      '00:10:00',
-      '00:00:30',
-    )
+    const videoPath = path.join(__dirname, 'master.m3u8')
 
-    await cutSomething([subtitlesPath], 'output.srt', '00:10:00', '00:00:30')
+    await cutSomething([videoPath], './src/cut.mp4', '00:09:20', '00:00:45')
+
+    const subPath = path.join(__dirname, 'subtitles.srt')
+    await cutSomething([subPath], './src/cut.srt', '00:09:20', '00:00:45')
 
     await new Promise((resolve) => {})
   })
 
-  it('should seperate video ', async () => {})
+  it('should try to sync subtitles', async () => {
+    const ogSubtitlesPath = path.join(__dirname, 'subtitles.srt')
+    const ogSubtitlesContent = await fsPromise.readFile(
+      ogSubtitlesPath,
+      'utf-8',
+    )
+
+    const ogParsedSubtitles = subtitle
+      .parseSync(ogSubtitlesContent)
+      .filter((s) => s.type === 'cue')
+
+    const whisperSubtitlesPath = path.join(__dirname, '..', 'output.srt')
+    const whisperSubtitles = await fsPromise.readFile(
+      whisperSubtitlesPath,
+      'utf-8',
+    )
+
+    const parsedWhisperSubtitles = subtitle
+      .parseSync(whisperSubtitles)
+      .filter((s) => s.type === 'cue')
+
+    const wordsSearchMin = 3
+    const diffs: {
+      delta: number
+      text: string
+    }[] = []
+
+    for (const row of parsedWhisperSubtitles) {
+      const text = row.data.text
+      const words = text.split(' ').slice(0, wordsSearchMin)
+
+      if (words.length < wordsSearchMin) {
+        continue
+      }
+
+      const keyword = words.join(' ')
+      console.log(keyword)
+
+      const ogRow = ogParsedSubtitles.find((r) => r.data.text.includes(keyword))
+
+      if (ogRow) {
+        diffs.push({
+          delta: row.data.start - ogRow.data.start,
+          text: ogRow.data.text,
+        })
+      }
+    }
+
+    console.log(diffs)
+  })
 })
