@@ -11,7 +11,7 @@ const main = async () => {
   const blocker = await PlaywrightBlocker.fromPrebuiltAdsAndTracking(fetch)
 
   const browser = await chromium.launchPersistentContext('', {
-    headless: false,
+    headless: true,
     channel: 'chrome',
     viewport: null,
   })
@@ -27,6 +27,7 @@ const main = async () => {
     const url = req.url()
     if (url.includes('.m3u8')) {
       console.log('m3u8 request url or rcp')
+      console.log(req.url())
       console.log(req.headers())
       console.log(req.postData())
     } else {
@@ -56,19 +57,21 @@ const main = async () => {
 
   const [domain, hash] = initialIframeSrc.split(delimiter)
 
-  const bestServerHash = serverHashes[serverHashes.length - 1]
+  // const bestServerHash = serverHashes[serverHashes.length - 1]
 
-  if (bestServerHash) {
-    const noProtocol = path.join(domain, delimiter, bestServerHash)
-    const url = new URL(`https://${noProtocol}`)
+  for (const hash of serverHashes) {
+    const url = new URL(`https://${domain}${delimiter}${hash}`)
+    console.log('Navigating to', url.toString().substring(0, 50))
     await page.goto(url.toString())
-  } else {
-    const url = new URL(`https://${initialIframeSrc}`)
-    await page.goto(url.toString())
+
+    const body = page.locator('body')
+    await body.click()
+    await body.click()
+    await body.click()
+    await page.waitForTimeout(5000)
+    console.log('Clicked body')
   }
 
-  const body = page.locator('body')
-  await body.click()
 
   // console.log(await iframeLocator1.locator('#player_iframe').getAttribute('src'))
   // const secondIframe = iframeLocator1.locator('#player_iframe')

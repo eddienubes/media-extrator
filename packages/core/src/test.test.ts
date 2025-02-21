@@ -7,6 +7,7 @@ import ffmpegBinary from '@ffmpeg-installer/ffmpeg'
 import ffmprobeBinary from '@ffprobe-installer/ffprobe'
 import { Readable } from 'node:stream'
 import { ReadableStream } from 'node:stream/web'
+import path from 'node:path'
 
 const getFfmpeg = () => {
   const ffmpeg = ffmpegFactory()
@@ -234,4 +235,53 @@ describe('something', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 600000))
   })
+
+  it('should convert hls to mp4', async () => {
+    const subtitlesPath = path.join(__dirname, 'subtitles.srt')
+
+    const cutSomething = async (
+      inputs: string[],
+      output: string,
+      start: string,
+      duration: string,
+    ) => {
+      const ffmpeg = getFfmpeg()
+
+      for (const input of inputs) {
+        ffmpeg.input(input)
+      }
+
+      ffmpeg
+        .seekInput(start)
+        .duration(duration)
+        .output(output)
+        // .outputOptions(['-c:s mov_text'])
+        // .outputOptions(['-c copy'])
+        .on('start', (cmd) => {
+          console.log('start', cmd)
+        })
+        .on('error', (err, stdout, stderr) => {
+          console.log(err, stdout, stderr)
+        })
+        .on('end', () => {
+          console.log('done')
+        })
+        .run()
+    }
+
+    await cutSomething(
+      [
+        'https://tmstr3.luminousstreamhaven.com/stream_new/H4sIAAAAAAAAAw3KXXNDQBQA0L_Ebgh9bFiGWkO4Pt6uvSbKEmYkVb..Pc_ngsgdZqNFvc0s5Vgm75VDeLU7oqvBPjIWXfJgj7rA5TCRndz3rR31C4Lj1cHA0hI.5TwABe2mOBSZcTlh2kuohgO5Ft0yhA0T_l3LWZ4Poy3XLQnztClXnrBj.mLDTOHwLKcf3owgcHyY0pNLwUSRA0R4c9_I5akmPQOssaoOP_GoymqYs8rdKMy_70WE0oPfftG33jfe6AH0NVhptUYxa19pKA7F3LhfhjNm2sw4NAkn7KvkKBey29nC1N_tfAFf1f_HAEY8e3c8f6JYseCkU98s6YyM7mxvySgnrEVBp.H.AfNjdHJBAQAA/master.m3u8',
+      ],
+      'output.mp4',
+      '00:10:00',
+      '00:00:30',
+    )
+
+    await cutSomething([subtitlesPath], 'output.srt', '00:10:00', '00:00:30')
+
+    await new Promise((resolve) => {})
+  })
+
+  it('should seperate video ', async () => {})
 })
