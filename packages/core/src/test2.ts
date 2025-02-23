@@ -40,7 +40,7 @@ const main = async () => {
   })
 
   await page.goto(
-    'https://vidsrc.xyz/embed/tv?imdb=tt11280740&season=2&episode=6',
+    'https://vidsrc.xyz/embed/tv?imdb=tt1119644&season=1&episode=1',
   )
 
   const serverLocators = await page.locator('.server').all()

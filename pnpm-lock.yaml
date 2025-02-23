@@ -74,6 +74,12 @@ importers:
       '@ngneat/falso':
         specifier: ^7.3.0
         version: 7.3.0
+      axios:
+        specifier: ^1.7.9
+        version: 1.7.9
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       drizzle-orm:
         specifier: ^0.39.1
         version: 0.39.1(postgres@3.4.5)
@@ -84,9 +90,6 @@ importers:
         specifier: ^0.13.4
         version: 0.13.4
       patchright:
-        specifier: ^1.50.1
-        version: 1.50.1
-      playwright:
         specifier: ^1.50.1
         version: 1.50.1
       playwright-extra:
@@ -1193,6 +1196,9 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
+  axios@1.7.9:
+    resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
+
   b4a@1.6.7:
     resolution: {integrity: sha512-OnAYlL5b7LEkALw87fUVafQw5rVR9RjwGd4KUwNQ6DrrNmaVaUCgLipfVlzrPQ4tWOR9P0IXGNOx50jYCCdSJg==}
 
@@ -1419,6 +1425,9 @@ packages:
   data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
     engines: {node: '>= 12'}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   debug@4.4.0:
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
@@ -1740,6 +1749,15 @@ packages:
   fluent-ffmpeg@2.1.3:
     resolution: {integrity: sha512-Be3narBNt2s6bsaqP6Jzq91heDgOEaDCJAXcE3qcma/EJBSy5FB4cvO31XBInuAuKBx8Kptf8dkhjK0IOru39Q==}
     engines: {node: '>=18'}
+
+  follow-redirects@1.15.9:
+    resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
 
   for-in@0.1.8:
     resolution: {integrity: sha512-F0to7vbBSHP8E3l6dCjxNOLuSFAACIxFy3UehTUlG7svlXi37HHsDkyVcHo0Pq8QwrE+pXvWSVX3ZT1T9wAZ9g==}
@@ -2377,6 +2395,9 @@ packages:
   process@0.11.10:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
     engines: {node: '>= 0.6.0'}
+
+  proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
   pump@3.0.2:
     resolution: {integrity: sha512-tUPXtzlGM8FE3P0ZL6DVs/3P58k9nk8/jZeQCurTJylQA8qFYzHFfhBJkuqyE0FifOsQ0uKWekiZ5g8wtr28cw==}
@@ -3801,6 +3822,14 @@ snapshots:
 
   asynckit@0.4.0: {}
 
+  axios@1.7.9:
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.1
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   b4a@1.6.7: {}
 
   balanced-match@1.0.2: {}
@@ -4089,6 +4118,8 @@ snapshots:
   css-what@6.1.0: {}
 
   data-uri-to-buffer@4.0.1: {}
+
+  date-fns@4.1.0: {}
 
   debug@4.4.0(supports-color@9.4.0):
     dependencies:
@@ -4415,6 +4446,8 @@ snapshots:
     dependencies:
       async: 0.2.10
       which: 1.3.1
+
+  follow-redirects@1.15.9: {}
 
   for-in@0.1.8: {}
 
@@ -5006,6 +5039,8 @@ snapshots:
   process-nextick-args@2.0.1: {}
 
   process@0.11.10: {}
+
+  proxy-from-env@1.1.0: {}
 
   pump@3.0.2:
     dependencies:

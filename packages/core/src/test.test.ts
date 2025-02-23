@@ -5,10 +5,13 @@ import fsPromise from 'node:fs/promises'
 import ffmpegFactory, { FfmpegCommandOptions } from 'fluent-ffmpeg'
 import ffmpegBinary from '@ffmpeg-installer/ffmpeg'
 import ffmprobeBinary from '@ffprobe-installer/ffprobe'
-import { Readable } from 'node:stream'
+import { Duplex, PassThrough, Readable, Writable } from 'node:stream'
 import { ReadableStream } from 'node:stream/web'
 import path from 'node:path'
 import subtitle from 'subtitle'
+import * as fns from 'date-fns'
+import { waitForMs } from './common/asyncUtils.js'
+import { Error } from 'postgres'
 
 const getFfmpeg = () => {
   const ffmpeg = ffmpegFactory()
@@ -257,7 +260,7 @@ describe('something', () => {
         .duration(duration)
         .output(output)
         // .outputOptions(['-c:s mov_text'])
-        // .outputOptions(['-c copy'])
+        .outputOptions(['-c copy'])
         .on('start', (cmd) => {
           console.log('start', cmd)
         })
@@ -274,7 +277,7 @@ describe('something', () => {
 
     await cutSomething([videoPath], './src/cut.mp4', '00:09:20', '00:00:45')
 
-    const subPath = path.join(__dirname, 'subtitles.srt')
+    const subPath = path.join(__dirname, 'parsed.srt')
     await cutSomething([subPath], './src/cut.srt', '00:09:20', '00:00:45')
 
     await new Promise((resolve) => {})
@@ -329,5 +332,46 @@ describe('something', () => {
     }
 
     console.log(diffs)
+  })
+
+  it('should cut subtitles', async () => {
+    const subtitlesPath = path.join(__dirname, 'subtitles.srt')
+    const subtitlesStream = fs.createReadStream(subtitlesPath)
+
+    const timeToMs = (time: string) => {
+      const [hours, minutes, seconds] = time.split(/[:,]/)
+      console.log(hours, parseInt(minutes, 10), seconds)
+
+      return (
+        (parseInt(hours, 10) * 3600 +
+          parseInt(minutes, 10) * 60 +
+          parseInt(seconds, 10)) *
+        1000
+      )
+    }
+
+    const start = '00:09:20'
+    const duration = '00:00:45'
+
+    const startMs = timeToMs(start)
+    const endMs = startMs + timeToMs(duration)
+
+    subtitlesStream
+      .pipe(subtitle.parse())
+      .pipe(
+        subtitle.filter((node) => {
+          if (node.type === 'header') return true
+
+          if (node.data.start < startMs) {
+            return false
+          }
+
+          return node.data.end <= endMs
+        }),
+      )
+      .pipe(subtitle.stringify({ format: 'SRT' }))
+      .pipe(fs.createWriteStream(path.join(__dirname, 'parsed.srt')))
+
+    await waitForMs()
   })
 })
